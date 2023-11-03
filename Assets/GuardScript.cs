@@ -37,7 +37,7 @@ public class GuardScript : MonoBehaviour
                     UnityEngine.Object Bullet = Instantiate(bullet_type);
                     Transform BulletTransform = Bullet.GameObject().transform;
                     BulletTransform.position = hit.point;
-                    BulletTransform.rotation = Quaternion.Euler(arm.rotation.eulerAngles.x, 0, );
+                    BulletTransform.rotation = Quaternion.Euler(0, 0, arm.rotation.eulerAngles.x);
                     //BulletTransform.rotation = targetRotation;
                 };
                 
