@@ -8,14 +8,16 @@ using UnityEngine;
 public class GuardScript : MonoBehaviour
 {
     Transform arm;
-    public GameObject looking_for_target;
-    Transform target;
+    public GameObject intended_target;
+    Transform intended_target_Transform;
+    Transform current_target;
     public UnityEngine.Object bullet_type;
 
     RaycastHit2D hit;
     // Start is called before the first frame update
     void Start()
     {
+        intended_target_Transform = intended_target.transform;
         arm = this.transform.GetChild(1).transform;
         Debug.Log(arm);
     }
@@ -24,26 +26,37 @@ public class GuardScript : MonoBehaviour
     void Update()
     {
         
-        if (target != null) {
-            var direction = (arm.position - target.position).normalized;
+        if (current_target != null) {
+            var direction = (arm.position - current_target.position).normalized;
             var targetRotation = Quaternion.LookRotation(direction);
             arm.rotation =  Quaternion.RotateTowards(arm.rotation, targetRotation, 50f * Time.deltaTime);
             if (arm.rotation == targetRotation) {
                 //fire
-                target = null;
+                current_target = null;
                 hit = Physics2D.Raycast(arm.position, -direction);
                 if (hit) {
                     
                     UnityEngine.Object Bullet = Instantiate(bullet_type);
                     Transform BulletTransform = Bullet.GameObject().transform;
+
                     BulletTransform.position = hit.point;
-                    BulletTransform.rotation = Quaternion.Euler(0, 0, arm.rotation.eulerAngles.x);
-                    //BulletTransform.rotation = targetRotation;
+                    BulletTransform.rotation = targetRotation;
+                    BulletTransform.localScale = new Vector3(1,1 , Vector3.Distance(hit.point, arm.position));
+
+                    if (hit.transform == intended_target_Transform) {
+                        intended_target.GetComponent<PlayerScript>().Die();
+                    }
                 };
                 
             }
         } else {
-            target = looking_for_target.transform;
+
+            var direction_of_potential_target = (this.transform.position - intended_target_Transform.position).normalized;
+            //var Rotation = Quaternion.LookRotation(direction_of_potential_target);
+            hit = Physics2D.Raycast(arm.position, -direction_of_potential_target);
+            if (hit.transform == intended_target_Transform) {
+                current_target = intended_target_Transform;
+            }
         }
     }
 }

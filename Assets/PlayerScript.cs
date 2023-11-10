@@ -20,10 +20,14 @@ public class PlayerScript : MonoBehaviour
     public float StickForce;
     Collider2D PlayerCollider;
 
+    bool dead = false;
+
     static Vector2 NoWall = new Vector2(0, 0);
     static Vector2 Gravity = new Vector2(0, -100.0f);
 
     void move() {
+        if (dead) { return; };
+
         ContactPoint2D[] points = new ContactPoint2D[4];
         body.GetContacts(points);
         SumNormal = points[0].normal + points[1].normal + points[2].normal + points[3].normal;
@@ -74,5 +78,9 @@ public class PlayerScript : MonoBehaviour
             Debug.DrawRay(MousePos, MousePos+ new Vector3(1,1,0), UnityEngine.Color.black, 1f);
         }
         body.velocity = Vector2.ClampMagnitude(body.velocity, MaxSpeed);
+    }
+    public void Die() {
+        Debug.Log("the pain was unbearable");
+        dead = true;
     }
 }
