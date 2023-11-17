@@ -11,7 +11,7 @@ public class PlayerScript : MonoBehaviour
 
     [Header("Movement")]
     Vector2 inputvec;
-    Vector3 MousePos;
+    Vector2 MousePos;
     Vector2 SumNormal;
     public Rigidbody2D body;
     public float moveSpeed;
@@ -21,6 +21,7 @@ public class PlayerScript : MonoBehaviour
     Collider2D PlayerCollider;
 
     bool dead = false;
+    bool isDashing = false;
 
     static Vector2 NoWall = new Vector2(0, 0);
     static Vector2 Gravity = new Vector2(0, -100.0f);
@@ -40,14 +41,24 @@ public class PlayerScript : MonoBehaviour
             inputvec.x = Input.GetAxis("Horizontal");
             inputvec.y = SumNormal.x != 0 ? Input.GetAxis("Vertical") : 0;
             body.AddForce((inputvec * moveSpeed) * Time.deltaTime);
-
         }
 
-        if (SumNormal == NoWall) {
+        if (SumNormal == NoWall && !isDashing) {
             body.AddForce(Gravity * Time.deltaTime);
         } else {
             body.AddForce(-SumNormal * StickForce * Time.deltaTime);
         }
+
+        if (Input.GetButtonDown("Dash")) {
+            Debug.Log("DASH");
+            //isDashing = true;
+            MousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Debug.DrawRay(MousePos, MousePos + new Vector2(1, 1), UnityEngine.Color.black, 1f);
+            body.MovePosition(
+                ((MousePos - (Vector2)transform.position).normalized * 5.0f) + (Vector2)transform.position
+            );
+        }
+
     }
     void Start() {
         PlayerCollider = gameObject.GetComponent<Collider2D>();
@@ -72,11 +83,7 @@ public class PlayerScript : MonoBehaviour
     void Update()
     {
         move();
-        if (Input.GetButtonDown("Dash")) {
-            Debug.Log("DASH");
-            MousePos = Input.mousePosition;
-            Debug.DrawRay(MousePos, MousePos+ new Vector3(1,1,0), UnityEngine.Color.black, 1f);
-        }
+
         body.velocity = Vector2.ClampMagnitude(body.velocity, MaxSpeed);
     }
     public void Die() {
