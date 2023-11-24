@@ -25,7 +25,7 @@ public class GuardScript : MonoBehaviour
         Debug.Log(arm);
 
         Selfbounds = gameObject.transform.GetChild(0).GetComponent<Renderer>().bounds;
-        Tragetbounds = intended_target.GetComponent<Renderer>().bounds;
+        Tragetbounds = intended_target.GetComponent<Renderer>().bounds; 
     }
 
     public void Die() {
