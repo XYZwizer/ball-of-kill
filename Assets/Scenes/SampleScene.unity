@@ -176,6 +176,8 @@ MonoBehaviour:
   JumpSpeed: 50
   MaxSpeed: 20
   StickForce: 30
+  DashTime: 0.1
+  DashSpeed: 50
 --- !u!50 &86291613
 Rigidbody2D:
   serializedVersion: 4

@@ -13,6 +13,9 @@ public class GuardScript : MonoBehaviour
     Transform current_target;
     public UnityEngine.Object bullet_type;
 
+    Bounds Selfbounds;
+    Bounds Tragetbounds;
+
     RaycastHit2D hit;
     // Start is called before the first frame update
     void Start()
@@ -20,11 +23,17 @@ public class GuardScript : MonoBehaviour
         intended_target_Transform = intended_target.transform;
         arm = this.transform.GetChild(1).transform;
         Debug.Log(arm);
+
+        Selfbounds = gameObject.transform.GetChild(0).GetComponent<Renderer>().bounds;
+        Tragetbounds = intended_target.GetComponent<Renderer>().bounds;
+    }
+
+    public void Die() {
+        gameObject.GetComponent<WalkScript>().enabled = false;
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         
         if (current_target != null) {
             var direction = (arm.position - current_target.position).normalized;
@@ -58,5 +67,19 @@ public class GuardScript : MonoBehaviour
                 current_target = intended_target_Transform;
             }
         }
+
+
+        if (Selfbounds.Intersects(Tragetbounds) && intended_target.GetComponent<PlayerScript>().isDashing) {
+            Die();
+        }
     }
+    //private void OnCollisionEnter(Collision collision) {
+    //    PlayerScript PlayerS = collision.gameObject.GetComponent<PlayerScript>();
+    //
+    //    if (PlayerS != null) {
+    //        if (PlayerS.isDashing) {
+    //            Die();
+    //        }
+    //    }
+    //}
 }

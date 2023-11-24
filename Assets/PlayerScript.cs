@@ -11,7 +11,8 @@ public class PlayerScript : MonoBehaviour
 
     [Header("Movement")]
     Vector2 inputvec;
-    Vector2 MousePos;
+    Vector2 DashVec;
+    Vector2 preDashvel;
     Vector2 SumNormal;
     public Rigidbody2D body;
     public float moveSpeed;
@@ -20,8 +21,11 @@ public class PlayerScript : MonoBehaviour
     public float StickForce;
     Collider2D PlayerCollider;
 
+    public float DashTime = 0.1f;
+    public float DashSpeed = 50.0f;
+
     bool dead = false;
-    bool isDashing = false;
+    public bool isDashing = false;
 
     static Vector2 NoWall = new Vector2(0, 0);
     static Vector2 Gravity = new Vector2(0, -100.0f);
@@ -51,12 +55,21 @@ public class PlayerScript : MonoBehaviour
 
         if (Input.GetButtonDown("Dash")) {
             Debug.Log("DASH");
-            //isDashing = true;
-            MousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            isDashing = true;
+            Vector2 MousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            DashVec = (MousePos - (Vector2)transform.position).normalized;
             Debug.DrawRay(MousePos, MousePos + new Vector2(1, 1), UnityEngine.Color.black, 1f);
-            body.MovePosition(
-                ((MousePos - (Vector2)transform.position).normalized * 5.0f) + (Vector2)transform.position
-            );
+            preDashvel = body.velocity;
+            StartCoroutine(atEndofDashTime(DashTime));
+        }
+        IEnumerator atEndofDashTime(float waitTime) {
+            yield return new WaitForSeconds(waitTime);
+            isDashing = false;
+            body.velocity = preDashvel;
+        }
+        if (isDashing) {
+            //body.AddForce
+            body.velocity = (DashVec * DashSpeed);
         }
 
     }
@@ -83,8 +96,9 @@ public class PlayerScript : MonoBehaviour
     void Update()
     {
         move();
-
-        body.velocity = Vector2.ClampMagnitude(body.velocity, MaxSpeed);
+        if (!isDashing) { 
+            body.velocity = Vector2.ClampMagnitude(body.velocity, MaxSpeed);
+        }
     }
     public void Die() {
         Debug.Log("the pain was unbearable");
