@@ -25,11 +25,27 @@ public class GuardScript : MonoBehaviour
         Debug.Log(arm);
 
         Selfbounds = gameObject.transform.GetChild(0).GetComponent<Renderer>().bounds;
-        Tragetbounds = intended_target.GetComponent<Renderer>().bounds; 
+        
     }
 
     public void Die() {
-        gameObject.GetComponent<WalkScript>().enabled = false;
+        //gameObject.GetComponent<WalkScript>().enabled = false;
+        Debug.Log("gard died");
+        //Transform[] gibs = new Transform[] { gameObject.transform.GetChild(0), gameObject.transform.GetChild(1).transform.GetChild(0) , gameObject.transform.GetChild(1).transform.GetChild(1) };
+        //foreach (Transform t in gibs)
+        //{
+        //    t.AddComponent<Rigidbody2D>().mass = 5;
+        //}
+        Transform body = gameObject.transform.GetChild(0);
+        Transform arm = gameObject.transform.GetChild(1).GetChild(0);
+        Transform gun = gameObject.transform.GetChild(1).GetChild(1);
+
+        //body.GetComponent<BoxCollider>();
+        Destroy(body.GetComponent<BoxCollider>());
+        body.AddComponent<Rigidbody2D>();
+        gun.AddComponent<Rigidbody2D>();
+        gameObject.transform.DetachChildren();
+        Destroy(gameObject);
     }
 
     // Update is called once per frame
@@ -68,9 +84,15 @@ public class GuardScript : MonoBehaviour
             }
         }
 
-
-        if (Selfbounds.Intersects(Tragetbounds) && intended_target.GetComponent<PlayerScript>().isDashing) {
-            Die();
+        Tragetbounds = intended_target.GetComponent<Renderer>().bounds;
+        if (Selfbounds.Intersects(Tragetbounds)) {
+            Debug.Log("intersect");
+            if (intended_target.GetComponent<PlayerScript>().isDashing)
+            {
+                Debug.Log("he is dahing");
+                Die();
+            }
+            
         }
     }
     //private void OnCollisionEnter(Collision collision) {
